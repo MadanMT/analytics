@@ -1,12 +1,6 @@
 package com.avanseus.customhashmap;
 
-import org.apache.xerces.dom.ElementNSImpl;
-import org.bytedeco.javacpp.opencv_core;
-import org.omg.IOP.ENCODING_CDR_ENCAPS;
-
-import java.util.Arrays;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -17,6 +11,8 @@ public class CustomHashMap<K,V> {
     private Entry<K,V>[] table;
     static class Entry<K,V>{
         private K key;
+        private V value;
+        private Entry<K,V> next;
 
         public K getKey() {
             return key;
@@ -34,17 +30,6 @@ public class CustomHashMap<K,V> {
             this.value = value;
         }
 
-        public Entry<K, V> getNext() {
-            return next;
-        }
-
-        public void setNext(Entry<K, V> next) {
-            this.next = next;
-        }
-
-        private V value;
-        private Entry<K,V> next;
-
         public Entry(K key, V value, Entry<K, V> next) {
             this.key = key;
             this.value = value;
@@ -57,7 +42,8 @@ public class CustomHashMap<K,V> {
     }
 
     public int hashcode(K key){
-        return Math.abs(key.hashCode()) % capacity;
+        int hashCode = Math.abs(key.hashCode()) % capacity;
+        return hashCode;
     }
 
     public V get(K key){
@@ -129,7 +115,6 @@ public class CustomHashMap<K,V> {
         Set<CustomHashMap.Entry<K,V>> entries = null;
         if (table == null) return null;
         entries = new LinkedHashSet<>();
-        System.out.println(table.length);
         for (Entry<K,V> entry : table){
             if (entry != null)entries.add(entry);
         }
@@ -142,12 +127,14 @@ public class CustomHashMap<K,V> {
         if (table == null) return defaultString;
         string.append("{");
         for (Entry<K,V> entry : table){
-            if (entry != null){
+            while ( entry != null){
                 string.append(entry.getKey()+"="+entry.getValue()+", ");
+                entry = entry.next;
             }
         }
         string.delete(string.lastIndexOf(","),string.length());
         string.append("}");
         return string.toString();
     }
+
 }
